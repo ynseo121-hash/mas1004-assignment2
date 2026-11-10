@@ -1,88 +1,50 @@
-% MAS1004 과제 2: 짧은 보고서, 한국어 양식.
-%
-% 이 과제를 하며 배운 것을 자유롭게 작성하면 됩니다.
-%   - 무엇을 해 봤고, 왜 그랬는지
-%   - 과제가 어떻게 진행되었는지
-%   - 무엇을 배웠는지
-%
-%  이 리포트는 본문을 한쪽으로 작성하며, LLM을 쓰지 않고 직접 작성합니다.
-% 본문 뒤에 그림을 세 쪽까지 더 붙일 수 있습니다.
-% XeLaTeX로 컴파일하면 됩니다.  (Overleaf: Menu, Compiler, XeLaTeX).
-
 \documentclass[11pt]{article}
 \usepackage[onepage,ko]{mas1004}
 
 \reporttitle{과제 2: 짧은 보고서}
-\studentname{이름}
-\studentid{학번}
+\studentname{김윤서}
+\studentid{20251129}
 
 \begin{document}
 \makeheader
 
-% 본문, 한 쪽. 아래 안내에 필요한 LaTeX 사용법이 있습니다.
-% 읽은 뒤 지우고, 그 자리에 보고서를 작성하면 됩니다.
+\section*{I. 실험 목적 및 배경}
 
-\section*{LaTeX}
+Data \& AI 강의에서 배운 인공지능 모델을 이용해 서로 다른 5개 도시(서울, 부산, 도쿄, 오사카, 타이베이)의 길거리 사진을 보고 도시를 맞추는 과제를 진행했습니다.
 
-이 파일은 LaTeX로 작성되어 있습니다. LaTeX 파일은 글과 몇 가지 명령이 들어 있는
-텍스트 파일이고, 명령은 \verb|\section*|처럼 역슬래시로 시작합니다. 한국어
-키보드에서는 ₩ 키가 역슬래시입니다. Overleaf에서는 왼쪽에 파일이, 오른쪽에 PDF가
-보입니다. Recompile 버튼을 누르면 Overleaf가 파일을 읽어 PDF를 다시 만듭니다.
+가장 먼저 제공된 기본 코드(Baseline)로 1차 학습을 돌려보았는데, 전체 정확도는 49.56\%가 나왔습니다. 도시별로 결과를 확인해 보았더니 사진 수가 많은 도쿄는 62.82\%의 정확도를 기록한 반면, 사진 수가 적고 비교적 어두운 사진이 많은 오사카(34.02\%)와 부산(38.56\%)의 정확도가 특히 낮음을 알 수 있었습니다. 이번 과제에서는 한 번의 시도에 한 번의 조건만 변경하는 것을 원칙으로 데이터 증강(Data Augmentation)을 활용해 총 3차에 걸쳐 실험해 보았습니다.
 
-이 쪽에 보이는 내용은 모두 왼쪽 파일에서 나온 것입니다. 왼쪽과 오른쪽을 견주어
-보면 각 부분을 어떻게 쓰는지 알 수 있습니다. 다 읽었으면 이 안내를
-\verb|\section*{LaTeX}|부터 \verb|\figurepages| 바로 앞 줄까지 지우고, 그 자리에
-보고서를 작성하면 됩니다.
+\section*{II. 세 번의 실험과 결과 비교}
 
-\section*{글 쓰기}
+\begin{enumerate}[label=\arabic* 서비스 학습:, leftmargin=1.5em]
+  \item[\bfseries ① 1차 학습 :] 주어진 코드 그대로 실행하여 도쿄나 서울과 같은 깔끔한 사진에 익숙해지고 비교적 그렇지 않은 도시는 정확도가 좋지 않았습니다.
+  \item[\bfseries ② 2차 학습 :] 가장 낮은 정확도를 기록한 오사카의 정확도를 올리는 것을 목표로, 기존에 설정되어 있던 자르기 범위를 줄이고(Crop 0.5), 사진에 흐림 효과(GaussianBlur)와 강한 색상 변형을 하여 다시 학습했습니다. 결과 오사카의 정확도는 6.25\%p나 상승한 40.27\%를 기록했습니다. 하지만 가장 높은 정확도를 기록했던 도쿄의 정확도가 떨어졌습니다. 전체 정확도는 49.56\%로 1차 학습과 동일한 결과를 확인했습니다.
+  \item[\bfseries ③ 3차 학습 :] 2차 학습 때 추가한 블러 효과가 1차 학습에 효과적이었던 특징들을 가려 정확도가 오히려 떨어졌다고 예상하고 블러 효과를 뺀 뒤 색상 변화를 일부 조정했습니다. 1차, 2차 학습과 비교하여 도쿄(61.99\%)와 서울(57.78\%)의 정확도는 비슷한 수준으로 회복했지만 오사카의 정확도는 다시 떨어졌습니다.
+\end{enumerate}
 
-\begin{itemize}
-  \item 문장은 그대로 입력하면 됩니다. 한 문단 안에서 줄을 바꾼 것은 결과에
-    나타나지 않습니다. 줄은 LaTeX가 알아서 나눕니다.
-  \item 빈 줄을 하나 넣으면 새 문단이 시작됩니다.
-  \item \verb|\section*{소제목}|은 이 쪽에 있는 것과 같은 소제목을 만듭니다.
-    소제목은 쓰지 않아도 됩니다.
-  \item 이런 목록은 \verb|\begin{itemize}|로 시작하고, 항목마다 앞에
-    \verb|\item|을 쓰고, \verb|\end{itemize}|로 끝냅니다.
-\end{itemize}
-
-\section*{특수 문자}
-
-\verb|%|는 주석을 시작합니다. 그 줄에서 \verb|%| 뒤에 있는 내용은 PDF에 나오지
-않습니다. 파일 맨 위의 안내도 주석입니다. \verb|% $ & # _ { }|를 글자로 쓰려면
-앞에 역슬래시를 붙입니다: \verb|\%|, \verb|\$|, \verb|\&|, \verb|\#|,
-\verb|\_|, \verb|\{|, \verb|\}|.
-
-\section*{이름과 그림}
+\section*{III. 과제를 통해 느낀 점과 배운 점}
 
 \begin{itemize}
-  \item 파일 위쪽의 \verb|\studentname{...}|과 \verb|\studentid{...}|에 이름과
-    학번을 씁니다.
-  \item 그림은 \verb|\figurepages| 뒤에, 세 쪽까지 넣을 수 있습니다. 왼쪽 파일
-    목록 위의 Upload 버튼으로 그림 파일을 올립니다. 그리고 \verb|\figurepages|
-    뒤에 있는 예시 그림에서 \verb|example-image-a| 자리에 그 파일 이름을 씁니다.
-    \verb|width=0.7\linewidth|는 그림의 폭을 본문 폭의 0.7배로 정합니다.
-  \item 그림을 더 넣으려면 \verb|\begin{figure}|부터 \verb|\end{figure}|까지를
-    복사해 씁니다. 그림이 없으면 예시를 지웁니다.
-\end{itemize}
-
-\section*{오류가 날 때}
-
-\begin{itemize}
-  \item Recompile 뒤에 오류가 나오면 메시지에 있는 줄 번호를 봅니다. 대개
-    \verb|}|가 빠졌거나, 위의 특수 문자 앞에 역슬래시가 없는 경우입니다.
-  \item 본문이 한 쪽을 넘으면 본문 끝에 빨간 글씨가 나옵니다. 그림이 세 쪽을
-    넘을 때도 빨간 글씨가 나옵니다.
+  \item 각 도시마다 데이터의 특징이 다르기 때문에 모든 도시 구분의 정확도를 올리는 증강 기법을 찾기 어려웠습니다. 2차 학습에서 블러 처리와 색상 변형으로 흐릿한 데이터의 오사카 구분 정확도를 높인 반면 도쿄와 서울의 정확도가 떨어졌고 3차 학습에서 이 처리를 줄이니 다시 반대로 돌아갔습니다. 이를 통해 도시별로 데이터에 따라 필요한 데이터 변형 기법이 다른 트레이드오프(Trade-off) 현상을 직접 확인해 볼 수 있었습니다. 추후 정확도 상승을 위해서는 각 데이터별 특성을 파악하고 그에 맞는 변형 기법을 적용할 필요가 있다고 생각됩니다.
+  \item 이미지만을 변형해 학습한 결과로는 정확도가 3차의 학습 모두에서 절반을 넘지 못하고 49.56\%에 머물렀습니다. 특정 도시의 정확도가 높아져도 전체 도시 모두를 고르게 높이기 어려우니 모델 파라미터를 통한 수정에 한계가 있음을 알게 되었습니다. 이를 해결하기 위해 직접 데이터 개수를 고르게 맞추거나 분류에 오류가 생길 수 있는 데이터들을 고르는 작업이 필요한 것으로 예상됩니다. 하지만 4차, 5차 추가 학습까지 진행해 보며 전체 정확도가 어떻게 같은 수치로 유지되는지 더 학습과 결과 도출을 통해 확인해 보고 싶기도 합니다.
 \end{itemize}
 
 \figurepages
 
-% 그림, 세 쪽까지.
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\linewidth]{commons_7266637.jpg}
+  \includegraphics[width=0.85\linewidth]{commons_9476105.jpg}
+  \caption{선명한 건물 구조와 도로 표지판이 특징인 서울 및 도쿄 길거리 데이터 예시}
+\end{figure}
+
+\clearpage
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.7\linewidth]{example-image-a}
-  \caption{그림 설명.}
+  \includegraphics[width=0.85\linewidth]{commons_2691073.jpg}
+  \includegraphics[width=0.55\linewidth]{commons_4000589.jpg}
+  \caption{조명 변형 및 노이즈가 비교적 크게 관찰되는 오사카 및 부산 길거리 데이터 예시}
 \end{figure}
 
 \end{document}
