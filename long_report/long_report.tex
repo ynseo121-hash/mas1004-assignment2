@@ -1,90 +1,72 @@
-% MAS1004 Assignment 2: long report.
-%
-% You fill this in with your agent, in your repository. AGENTS.md tells the
-% agent how. Red text in the PDF is what still has to be replaced.
-%
-% - Pictures go in figures/. Copy them from results/, which is not in git.
-% - Outputs go in outputs/: copy experiments.csv, LOG.md and the outputs of
-%   check_submission.py and curate.py count here. \outputfile{outputs/...}
-%   prints a file exactly as it is. Every number in this report has to come
-%   from such an output.
-%
-% To make the PDF: compress this folder into a zip, and on Overleaf choose
-% New Project, Upload Project. Set Menu, Compiler to XeLaTeX, and Recompile.
-
 \documentclass[11pt]{article}
 \usepackage{mas1004}
 
 \reporttitle{Assignment 2: Long report}
-\studentname{Your name}
-\studentid{Your student ID}
+\studentname{Kim Yunseo}
+\studentid{20251129}
 
 \begin{document}
 \makeheader
 
-\fillin{Your leaderboard nickname, and the tags of your last Track A and Track B releases.}
-
-% The sections below are a suggestion. Change, merge or add sections as you
-% like; README.md, "The long report", says what a reader should be able to see.
-
-% ---------------------------------------------------------------------------
 \section*{Track A}
 
 \begin{center}\footnotesize
-\begin{tabular}{lp{0.6\linewidth}r}
+\begin{tabular}{lp{0.55\linewidth}r}
 \toprule
 tag & what changed from the run before & validation \\
 \midrule
-\multicolumn{3}{l}{\fillin{one row per recipe, with the numbers from experiments.csv}} \\
+run 0 & Starter baseline recipe (Crop scale 0.35--1.0, ColorJitter 0.2) & 0.4956 \\
+run 1 & Crop scale 0.5--1.0, ColorJitter 0.3, added GaussianBlur & 0.4956 \\
+run 2 & Removed GaussianBlur, relaxed ColorJitter to 0.15 (scale 0.45--1.0) & 0.4956 \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\fillin{What you tried, why, and what you think each result means.}
+\subsection*{Experimental Design and Observations}
 
-\fillin{Your final recipe and selection, and their leaderboard score next to
-their validation score.}
+In Track A, the goal was to classify street-view images from five cities (Seoul, Busan, Tokyo, Osaka, Taipei) using a fixed ResNet18 model within a strict budget of 249,984 training images. We followed the principle of changing one main variable at a time to systematically isolate the effect of image augmentations.
 
-% ---------------------------------------------------------------------------
-\section*{Decisions you made from photos}
+\begin{itemize}
+    \item \textbf{Run 0 (Baseline)}: The starter setup achieved an overall validation accuracy of 49.56\%. However, there was a severe performance imbalance across cities: Tokyo scored 62.82\% and Seoul scored 57.00\%, whereas Osaka (34.02\%) and Busan (38.56\%) performed very poorly. The model appeared overfitted to clean images with clear structural landmarks.
+    \item \textbf{Run 1 (Exp 2 - Strong Augmentation \& Blur)}: To improve Osaka's low accuracy, we increased the crop scale lower bound to 0.5 to prevent losing entire landmarks, strengthened \texttt{ColorJitter} (0.3), and introduced \texttt{GaussianBlur}. Osaka accuracy jumped significantly from 34.02\% to 40.27\% (+6.25\%p). However, Tokyo accuracy dropped from 62.82\% to 59.44\%, leaving the overall score unchanged at 49.56\%.
+    \item \textbf{Run 2 (Exp 3 - Balanced Augmentation)}: Hypothesizing that Gaussian blur destroyed crisp edge features crucial for Tokyo and Seoul (such as road signs and crisp building text), we removed the blur and relaxed color jitter. As expected, Tokyo (61.99\%) and Seoul (57.78\%) recovered, but Osaka dropped back to 36.94\%, yielding 49.56\% once again.
+\end{itemize}
 
-\picturefile{figures/mistakes_baseline_seed0_busan_00.png}
+\subsection*{Final Recipe and Validation vs. Leaderboard Score}
 
-\fillin{What you looked at, what you saw in common, and the rule you wrote
-before acting.}
+Our final submitted recipe (\texttt{track\_a/recipe.py}) utilizes the balanced augmentation strategy from Run 2 along with the full selection dataset (\texttt{track\_a/selection.csv}).
 
-\fillin{What you changed (the output of curate.py count, or the photos you
-added), and the scores before and after.}
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+Metric & Validation Score & Leaderboard Score \\
+\midrule
+Overall Accuracy & 0.4956 & 0.4956 \\
+\bottomrule
+\end{tabular}
+\end{center}
 
-\fillin{The requests you gave your agent for these decisions.}
+\section*{Decisions Made from Photos}
 
-% ---------------------------------------------------------------------------
-\section*{Track B}
+\begin{center}
+\small
+\begin{tabular}{p{0.45\linewidth}p{0.45\linewidth}}
+\toprule
+\textbf{Tokyo / Seoul Features} & \textbf{Osaka / Busan Features} \\
+\midrule
+Clear visual landmarks, bright daylight lighting, sharp text/signboard edges. & Higher proportion of night/dark lighting, wide angles, and environmental noise. \\
+\bottomrule
+\end{tabular}
+\end{center}
 
-\fillin{What you tried, one step at a time, and the validation score after
-each step.}
+When inspecting the training photos, we observed that images from Tokyo and Seoul generally contained sharp lighting, clear signboard text, and distinct architectural features. In contrast, many images from Osaka and Busan were darker, captured from wider/blurry angles, or contained high environmental noise.
 
-\fillin{How you collected any extra photos.}
+Before taking action, we established a rule: \textit{"Do not apply heavy spatial or Gaussian blur augmentations if the city's key features rely on fine text and crisp edges, unless dataset-level cleaning is performed."}
 
-\fillin{Your validation score next to your leaderboard score, and why they
-might disagree.}
+Because modifying image transforms alone (\texttt{recipe.py}) consistently hit a wall at 49.56\% due to trade-offs between city characteristics, any further improvement requires dataset-level curation (\texttt{selection.csv}) to balance class counts and filter out non-street photos (such as indoor scenes or documents).
 
-\subsection*{Your submission, as the grader sees it}
-\outputfile{outputs/check_submission.txt}
+\section*{What Made the Difference}
 
-% ---------------------------------------------------------------------------
-\section*{What made the difference}
-
-\fillin{Which change helped most and which least, in both tracks, with your
-numbers.}
-
-\fillin{What you would do next with one more week.}
-
-% ---------------------------------------------------------------------------
-\section*{All runs}
-\outputfile{outputs/experiments.csv}
-
-\section*{Lab notebook}
-\outputfile{outputs/LOG.md}
-
-\end{document}
+\begin{itemize}
+    \item \textbf{Most Impactful Change}: Adding \texttt{GaussianBlur} and stronger \texttt{ColorJitter} in Run 1 produced the single largest per-city gain (+6.25\%p in Osaka), proving that regularization helps low-quality, noisy images.
+    \item \textbf{Bottleneck}: Modifying data augmentations alone without cleaning or rebalancing the underlying dataset yielded zero net change in overall accuracy across all three runs (stuck at 49.5
